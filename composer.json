@@ -1,0 +1,27 @@
+{
+    "name": "schnitzler/average-color-extractor",
+    "description": "Extracts the average color of images as hex value.",
+    "type": "typo3-cms-extension",
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "suggest": {
+        "ksubileau/color-thief-php": "A PHP class for grabbing the color palette from an image."
+    },
+    "replace": {
+        "average_color_extractor": "self.version",
+        "typo3-ter/average-color-extractor": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Schnitzler\\AverageColorExtractor\\": "Classes/"
+        }
+    },
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Alexander Schnitzler",
+            "email": "git@alexanderschnitzler.de"
+        }
+    ]
+}
