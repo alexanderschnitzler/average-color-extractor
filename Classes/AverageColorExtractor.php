@@ -1,10 +1,13 @@
 <?php
 namespace Schnitzler\AverageColorExtractor;
 
+use TYPO3\CMS\Core\Log\Logger;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Index\ExtractorInterface;
 use ColorThief\ColorThief;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class AverageColorExtractor
@@ -12,6 +15,16 @@ use ColorThief\ColorThief;
  */
 class AverageColorExtractor implements ExtractorInterface
 {
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    public function __construct()
+    {
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+    }
 
     /**
      * Returns an array of supported file types;
@@ -92,18 +105,18 @@ class AverageColorExtractor implements ExtractorInterface
 
         try {
             if (!class_exists('ColorThief\\ColorThief')) {
-                throw new \RuntimeException;
+                throw new \RuntimeException('Class ColorThief\\ColorThief does not exist', 1470749087524);
             }
 
             $path = $file->getForLocalProcessing();
             $averageColor = ColorThief::getColor($path);
 
             if (!is_array($averageColor)) {
-                throw new \RuntimeException;
+                throw new \RuntimeException('$averageColor is not an array', 1470749109020);
             }
 
             if (count($averageColor) !== 3) {
-                throw new \RuntimeException;
+                throw new \RuntimeException('$averageColor is an array, but has less than 3 items', 1470749136303);
             }
 
             $r = dechex((int)$averageColor[0]);
@@ -112,8 +125,9 @@ class AverageColorExtractor implements ExtractorInterface
 
             $metadata['average_color'] = '#' . $r . $g . $b;
 
-        } catch (\Exception $ignoredException) {
-            // deliberately empty
+            $this->logger->debug(sprintf('Extracted average color "%s"', $metadata['average_color'] ), ['file' => $file->getUid()]);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getCode() . ': ' . $e->getMessage(), ['file' => $file->getUid()]);
         }
 
         return $metadata;
